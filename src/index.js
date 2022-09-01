@@ -16,11 +16,20 @@ console.log(refs.inputSearchCountrie.target);
 
 refs.inputSearchCountrie.addEventListener('input', 
 
-    () => {
-        const inputValue = "Poland";
+    (event) => {
+        event.preventDefault();
+        const inputValue = event.target.value.trim();
+        console.log(inputValue);
   fetchCountries(inputValue)
-    .then(data => console.log(data))
-    .catch((error) => console.log(error));
+      .then(data => {
+          console.log(data);
+          Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
+ 
+      })
+      .catch((error) => {
+          console.log(error);
+           Notiflix.Notify.failure("Oops, there is no country with that name");
+      });
 });
     
 
