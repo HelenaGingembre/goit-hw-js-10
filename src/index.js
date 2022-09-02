@@ -2,7 +2,7 @@ import './css/styles.css';
 import Notiflix from 'notiflix';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
-// import { fetchCountries } from './fetchCountries';
+import { fetchCountries } from './fetchCountries';
 
 const BASE_URL = 'https://restcountries.com/v3.1';
 const DEBOUNCE_DELAY = 300;
@@ -13,27 +13,31 @@ const refs = {
     countryInfo: document.querySelector('.country-info'),
 }
 
- console.log(refs.countryList);
-// refs.inputSearchCountrie.addEventListener('input', 
+console.log(refs.countryList);
+ //применить приём Debounce на обработчике события и делать HTTP-запрос
+ // спустя 300мс после того, как пользователь перестал вводить текст.Используй пакет lodash.debounce.
+refs.inputSearchCountrie.addEventListener('input', debounce(onSearchCountry, DEBOUNCE_DELAY));
 
-    // (event) => {
-    //     event.preventDefault();
-    //     const inputValue = event.target.value.trim();
-let name = 'peru';
-        //console.log(inputValue);
        
-fetchCountries();
-function fetchCountries() {
-    return fetch('https://restcountries.com/v3.1/name/peru?fields=name,capital,population,flags,languages')
-        .then(response => {
-            if (!response.ok) {
-                    throw new Error(response.status);
-                    // Notiflix.Notify.failure("Oops, there is no country with that name");
-                }
-            return response.json();
-        })
-        .then(data => {
-            console.log(data[0]);
+ function onSearchCountry (event) {
+     event.preventDefault();
+     //Выполни санитизацию введенной строки методом trim(), 
+     //это решит проблему когда в поле ввода только пробелы или
+     // они есть в начале и в конце строки.
+     const searchCountry = event.target.value.trim();
+     console.log('searchCountry', searchCountry);
+     
+    //Если пользователь полностью очищает поле поиска, то HTTP-запрос не выполняется,
+    //а разметка списка стран или информации о стране пропадает.
+     if (!searchCountry) {
+         refs.countryList.innerHTML = '';
+         refs.countryInfo.innerHTML = '';
+         return;
+     }
+
+     fetchCountries(searchCountry)
+         .then(data => {
+            console.log('вивели дані пошуку',data[0]);
             
             if (data.length > 10) {
                 return Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
@@ -56,7 +60,7 @@ function markupCountryList({ flags, name, capital, population, languages }) {
     markup = `<li> <h3 class="country">
         <img class="flag"
         src = "${flags.svg}" 
-        alt = "flag" width = "30px"/>${name.common }
+        alt = "flag" width = "30px"/>${name.official }
         </h3>
          <p><b>Capital:</b> ${capital}</p></br>
         <p><b>Population:</b> ${population}</p></br>
