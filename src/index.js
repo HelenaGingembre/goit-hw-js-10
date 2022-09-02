@@ -13,7 +13,7 @@ const refs = {
     countryInfo: document.querySelector('.country-info'),
 }
 
-
+ console.log(refs.countryList);
 // refs.inputSearchCountrie.addEventListener('input', 
 
     // (event) => {
@@ -24,7 +24,7 @@ let name = 'peru';
         //?fields=name.official,population,flags.svg,languages
 fetchCountries();
 function fetchCountries() {
-    return fetch('https://restcountries.com/v3.1/all?fields=name,population,flags,languages')
+    return fetch('https://restcountries.com/v3.1/name/peru?fields=name,population,flags,languages')
         .then(response => {
             if (!response.ok) {
                     throw new Error(response.status);
@@ -33,12 +33,14 @@ function fetchCountries() {
             return response.json();
         })
         .then(data => {
-            console.log(data);
+            console.log(data[0]);
             
             if (data.length > 10) {
                 return Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
             } else {
-                refs.countryInfo.innerHTML = markupCountryList(data);
+                
+                refs.countryInfo.innerHTML = markupCountryList(data[0]);
+                console.log(refs.countryInfo.innerHTML);
             }
         })
         .catch((error) => {
@@ -52,10 +54,10 @@ function fetchCountries() {
 function markupCountryList({flags, name, population, languages }) {
     markup = `< li > 
         <h3 class="country">
-        < img class="flag" src = "${flags.svg}" alt = "flag" width = "30px" /> ${ name.official }
+        <!--< img class="flag" src = "${flags}" alt = "flag" width = "30px" /> ${ name }-->
         </h3>
         <p>${population}</p></br>
-       <p>${languages[0]}</p></br>
+       <p>${languages}</p></br>
       </li > `;
     return markup;       
 
