@@ -2,7 +2,7 @@ import './css/styles.css';
 import Notiflix from 'notiflix';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
-//import { fetchCountries } from './fetchCountries';
+// import { fetchCountries } from './fetchCountries';
 
 const BASE_URL = 'https://restcountries.com/v3.1';
 const DEBOUNCE_DELAY = 300;
@@ -22,24 +22,44 @@ const refs = {
 let name = 'peru';
         //console.log(inputValue);
         //?fields=name.official,population,flags.svg,languages
-fetch(
-    'https://restcountries.com/v3.1/name/peru?fields=name.official,population,flags.svg,languages')
-    .then(response => {
-        return response.json();
-    })
-      .then(countries => {
-          console.log(countries);
-        //   if(data > 10){
-          Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
-        //   }
-      })
-      .catch((error) => {
+fetchCountries();
+function fetchCountries() {
+    return fetch('https://restcountries.com/v3.1/all?fields=name,population,flags,languages')
+        .then(response => {
+            if (!response.ok) {
+                    throw new Error(response.status);
+                    // Notiflix.Notify.failure("Oops, there is no country with that name");
+                }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            
+            if (data.length > 10) {
+                return Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
+            } else {
+                refs.countryInfo.innerHTML = markupCountryList(data);
+            }
+        })
+        .catch((error) => {
           console.log(error);
            Notiflix.Notify.failure("Oops, there is no country with that name");
-      });
+    });
 
-    
+ }   
 
+
+function markupCountryList({flags, name, population, languages }) {
+    markup = `< li > 
+        <h3 class="country">
+        < img class="flag" src = "${flags.svg}" alt = "flag" width = "30px" /> ${ name.official }
+        </h3>
+        <p>${population}</p></br>
+       <p>${languages[0]}</p></br>
+      </li > `;
+    return markup;       
+
+};
     /*    fetchCountries("BASE_URL/name/${name}?fields=name.official,population,flags.svg,languages")
    
             .then(response => {
