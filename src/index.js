@@ -2,7 +2,7 @@ import './css/styles.css';
 import Notiflix from 'notiflix';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
- import { fetchCountries } from './fetchCountries';
+//import { fetchCountries } from './fetchCountries';
 
 const BASE_URL = 'https://restcountries.com/v3.1';
 const DEBOUNCE_DELAY = 300;
@@ -12,17 +12,23 @@ const refs = {
     countryList: document.querySelector('.country-list'),
     countryInfo: document.querySelector('.country-info'),
 }
-console.log(refs.inputSearchCountrie.target);
 
-refs.inputSearchCountrie.addEventListener('input', 
 
-    (event) => {
-        event.preventDefault();
-        const inputValue = event.target.value.trim();
-        console.log(inputValue);
-  fetchCountries(inputValue)
-      .then(data => {
-          console.log(data);
+// refs.inputSearchCountrie.addEventListener('input', 
+
+    // (event) => {
+    //     event.preventDefault();
+    //     const inputValue = event.target.value.trim();
+let name = 'peru';
+        //console.log(inputValue);
+        //?fields=name.official,population,flags.svg,languages
+fetch(
+    'https://restcountries.com/v3.1/name/peru?fields=name.official,population,flags.svg,languages')
+    .then(response => {
+        return response.json();
+    })
+      .then(countries => {
+          console.log(countries);
         //   if(data > 10){
           Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
         //   }
@@ -31,7 +37,7 @@ refs.inputSearchCountrie.addEventListener('input',
           console.log(error);
            Notiflix.Notify.failure("Oops, there is no country with that name");
       });
-});
+
     
 
     /*    fetchCountries("BASE_URL/name/${name}?fields=name.official,population,flags.svg,languages")
