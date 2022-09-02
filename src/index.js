@@ -23,8 +23,9 @@ refs.inputSearchCountrie.addEventListener('input',
   fetchCountries(inputValue)
       .then(data => {
           console.log(data);
+        //   if(data > 10){
           Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
- 
+        //   }
       })
       .catch((error) => {
           console.log(error);
