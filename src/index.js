@@ -4,7 +4,6 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
 import { fetchCountries } from './fetchCountries';
 
-const BASE_URL = 'https://restcountries.com/v3.1';
 const DEBOUNCE_DELAY = 300;
 
 const refs = {
@@ -13,8 +12,7 @@ const refs = {
     countryInfo: document.querySelector('.country-info'),
 }
 
-console.log(refs.countryList);
- //применить приём Debounce на обработчике события и делать HTTP-запрос
+//применить приём Debounce на обработчике события и делать HTTP-запрос
  // спустя 300мс после того, как пользователь перестал вводить текст.Используй пакет lodash.debounce.
 refs.inputSearchCountrie.addEventListener('input', debounce(onSearchCountry, DEBOUNCE_DELAY));
 
@@ -25,7 +23,7 @@ refs.inputSearchCountrie.addEventListener('input', debounce(onSearchCountry, DEB
      //это решит проблему когда в поле ввода только пробелы или
      // они есть в начале и в конце строки.
      const searchCountry = event.target.value.trim();
-     console.log('searchCountry', searchCountry);
+     console.log('searchCountry:', searchCountry);
      
     //Если пользователь полностью очищает поле поиска, то HTTP-запрос не выполняется,
     //а разметка списка стран или информации о стране пропадает.
@@ -34,60 +32,63 @@ refs.inputSearchCountrie.addEventListener('input', debounce(onSearchCountry, DEB
          refs.countryInfo.innerHTML = '';
          return;
      }
-
      fetchCountries(searchCountry)
          .then(data => {
-            console.log('вивели дані пошуку',data[0]);
+            // console.log('вивели дані пошуку: ',data);
             
             if (data.length > 10) {
                 return Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
             } else {
-                
-                refs.countryInfo.innerHTML = markupCountryList(data[0]);
-                console.log(refs.countryInfo.innerHTML);
-            }
+                renderCountryData(data);
+         }
         })
         .catch((error) => {
-          console.log(error);
+            console.log(error);
+            refs.countryList.innerHTML = '';
+            refs.countryInfo.innerHTML = '';
            Notiflix.Notify.failure("Oops, there is no country with that name");
     });
 
  }   
 
+function renderCountryData(data) {
+    if (data.length > 1) {
+        refs.countryInfo.innerHTML = '';
+        refs.countryList.innerHTML=markupCountriesList(data);
+    }
+    else {
+        refs.countryList.innerHTML = '';
+        refs.countryInfo.innerHTML = markupCountryInfo(data[0]);
+    }
+ }
 
-function markupCountryList({ flags, name, capital, population, languages }) {
-    console.log(languages);
-    markup = `<li> <h3 class="country">
+function markupCountryInfo({ flags, name, capital, population, languages }) {
+    // console.log(languages);
+    return `<h3 class="country">
         <img class="flag"
         src = "${flags.svg}" 
-        alt = "flag" width = "30px"/>${name.official }
+        alt = "flag" width = "40px"/>${name.official }
         </h3>
-         <p><b>Capital:</b> ${capital}</p></br>
-        <p><b>Population:</b> ${population}</p></br>
-       <p><b>Languages:</b> ${Object.values(languages)}</p></br>
-      </li > `;
-    return markup;       
-
+        <ul class="country-info-list--properties">
+            <li><b>Capital:</b> - ${capital}</li>
+            <li><b>Population:</b> - ${population}</li>
+            <li><b>Languages:</b> - ${Object.values(languages)}</li>
+       <ul>`;
 };
-    /*    fetchCountries("BASE_URL/name/${name}?fields=name.official,population,flags.svg,languages")
+
+function markupCountriesList(data) {
+    // console.log('список країн:', data);
+    const markup = data.map(({flags, name}) => {
+       return  `<li><img class="flag"
+                src = "${flags.svg}" 
+                alt = "flag" width = "40px"/>
+                ${name.official}</li>`;
+    }).join('');
+    console.log('markup список країн:', markup);
    
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(response.status);
-                    Notiflix.Notify.failure("Oops, there is no country with that name");
-                }
-                return response.json();
-                Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
-            })
-            .then(data => {
-                console.log(data);
-                // Data handling
-            })
-            .catch(error => {
-                // Error handling
-                console.log(error);
-            });
-  */
+    return markup;
+}
+   
 
     //Если пользователь ввёл имя страны которой не существует,
     // бэкенд вернёт не пустой массив, а ошибку со статус
