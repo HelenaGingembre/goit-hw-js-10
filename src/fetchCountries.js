@@ -9,7 +9,7 @@ function fetchCountries(name){
      console.log('fetchCountries - name:',name);
 
     return fetch(
-        "https://restcountries.com/v3.1/name/${name}?fields=name.official,population,flags.svg,languages"
+        "https://restcountries.com/v3.1/name/${name}?fields=name,capital,population,flags,languages"
     ).then(response => {
         if (!response.ok) {
             throw new Error(response.status);

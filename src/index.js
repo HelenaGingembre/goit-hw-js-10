@@ -21,10 +21,10 @@ const refs = {
     //     const inputValue = event.target.value.trim();
 let name = 'peru';
         //console.log(inputValue);
-        //?fields=name.official,population,flags.svg,languages
+       
 fetchCountries();
 function fetchCountries() {
-    return fetch('https://restcountries.com/v3.1/name/peru?fields=name,population,flags,languages')
+    return fetch('https://restcountries.com/v3.1/name/peru?fields=name,capital,population,flags,languages')
         .then(response => {
             if (!response.ok) {
                     throw new Error(response.status);
@@ -51,13 +51,16 @@ function fetchCountries() {
  }   
 
 
-function markupCountryList({flags, name, population, languages }) {
-    markup = `< li > 
-        <h3 class="country">
-        <!--< img class="flag" src = "${flags}" alt = "flag" width = "30px" /> ${ name }-->
+function markupCountryList({ flags, name, capital, population, languages }) {
+    console.log(languages);
+    markup = `<li> <h3 class="country">
+        <img class="flag"
+        src = "${flags.svg}" 
+        alt = "flag" width = "30px"/>${name.common }
         </h3>
-        <p>${population}</p></br>
-       <p>${languages}</p></br>
+         <p><b>Capital:</b> ${capital}</p></br>
+        <p><b>Population:</b> ${population}</p></br>
+       <p><b>Languages:</b> ${Object.values(languages)}</p></br>
       </li > `;
     return markup;       
 
